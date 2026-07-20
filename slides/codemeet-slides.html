@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CodeMeet AI — 使用情境</title>
+<style>
+  :root {
+    --ink: #0e1420;
+    --surface: #161d2c;
+    --surface-2: #1c2536;
+    --line: #2a3550;
+    --text: #e8ecf4;
+    --muted: #8a94a8;
+    --accent: #34d399;
+    --accent-dim: #34d39922;
+    --amber: #f5b94f;
+    --amber-dim: #f5b94f1f;
+    --red: #f0716d;
+    --mono: ui-monospace, "Cascadia Code", Consolas, "Courier New", monospace;
+    --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: var(--sans);
+    background: var(--ink);
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  /* ---------- deck chrome ---------- */
+  .progress {
+    position: fixed; top: 0; left: 0; height: 3px;
+    background: var(--accent); width: 0%;
+    transition: width .35s ease; z-index: 50;
+  }
+  .nav {
+    position: fixed; bottom: 20px; right: 24px; z-index: 50;
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--mono); font-size: 12px; color: var(--muted);
+  }
+  .nav button {
+    width: 36px; height: 36px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--surface);
+    color: var(--text); font-size: 16px; cursor: pointer;
+  }
+  .nav button:hover { border-color: var(--accent); color: var(--accent); }
+  .nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .hint {
+    position: fixed; bottom: 26px; left: 24px; z-index: 50;
+    font-family: var(--mono); font-size: 11px; color: var(--muted); opacity: .7;
+  }
+
+  /* ---------- slides ---------- */
+  .slide {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    padding: clamp(24px, 4vw, 64px);
+    opacity: 0; visibility: hidden; transform: translateY(14px);
+    transition: opacity .4s ease, transform .4s ease, visibility .4s;
+  }
+  .slide.active { opacity: 1; visibility: visible; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .slide, .progress { transition: none; }
+  }
+  .inner { width: min(1160px, 100%); max-height: 100%; overflow: auto; }
+
+  .eyebrow {
+    font-family: var(--mono); font-size: 12px; letter-spacing: .22em;
+    color: var(--accent); text-transform: uppercase; margin-bottom: 14px;
+  }
+  h1 { font-size: clamp(30px, 4.2vw, 52px); font-weight: 900; line-height: 1.2; text-wrap: balance; }
+  h2 { font-size: clamp(24px, 3vw, 38px); font-weight: 800; line-height: 1.25; text-wrap: balance; margin-bottom: 10px; }
+  .lede { color: var(--muted); font-size: clamp(14px, 1.4vw, 17px); line-height: 1.75; max-width: 34em; }
+
+  .cols { display: grid; grid-template-columns: 5fr 6fr; gap: clamp(24px, 3.5vw, 56px); align-items: center; }
+  @media (max-width: 860px) { .cols { grid-template-columns: 1fr; } }
+
+  .points { list-style: none; margin-top: 22px; display: flex; flex-direction: column; gap: 12px; }
+  .points li {
+    display: flex; gap: 10px; font-size: clamp(13px, 1.25vw, 15.5px);
+    line-height: 1.65; color: var(--text);
+  }
+  .points li::before { content: "▸"; color: var(--accent); flex-shrink: 0; }
+  .points b { color: var(--accent); font-weight: 700; }
+  .points .amber { color: var(--amber); font-weight: 700; }
+
+  /* ---------- mock panels ---------- */
+  .mock {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 16px; padding: 18px;
+    box-shadow: 0 24px 60px -30px rgba(0,0,0,.8);
+    font-size: 12px;
+  }
+  .mock-title {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+    padding-bottom: 10px; border-bottom: 1px solid var(--line); margin-bottom: 12px;
+  }
+  .dotr, .dotg { width: 8px; height: 8px; border-radius: 50%; }
+  .dotr { background: var(--red); }
+  .dotg { background: var(--accent); }
+  .card {
+    background: var(--surface-2); border: 1px solid var(--line);
+    border-radius: 10px; padding: 10px 12px;
+  }
+  .chip {
+    display: inline-block; font-family: var(--mono); font-size: 10px;
+    padding: 2px 8px; border-radius: 999px;
+    background: var(--accent-dim); color: var(--accent);
+    border: 1px solid #34d39944;
+  }
+  .chip.warn { background: var(--amber-dim); color: var(--amber); border-color: #f5b94f44; }
+  .chip.plain { background: transparent; color: var(--muted); border-color: var(--line); }
+  .mono { font-family: var(--mono); }
+  .mut { color: var(--muted); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stack { display: flex; flex-direction: column; gap: 8px; }
+  .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .bar { height: 7px; border-radius: 4px; background: var(--line); }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* meeting tiles */
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .tile {
+    background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px;
+    padding: 12px 8px; text-align: center; color: var(--muted); font-size: 11px;
+  }
+  .tile .avatar {
+    width: 30px; height: 30px; border-radius: 50%; background: var(--line);
+    color: var(--text); display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 6px; font-weight: 700; font-size: 13px;
+  }
+  .tile.speaking { border-color: var(--accent); }
+  .tile.speaking .avatar { background: var(--accent); color: #06281c; }
+
+  /* terminal */
+  .term { background: #0a0f18; border: 1px solid var(--line); border-radius: 12px; padding: 14px; font-family: var(--mono); font-size: 11.5px; line-height: 2; }
+  .term .g { color: var(--accent); }
+  .term .b { color: #7fb8f0; }
+  .term .w { color: #cbd5e4; }
+
+  /* code anchor line */
+  .code { font-family: var(--mono); font-size: 11px; line-height: 1.9; color: #cbd5e4; }
+  .code .anchor { background: var(--amber-dim); color: var(--amber); border-radius: 4px; padding: 1px 5px; }
+  .code .kw { color: #7fb8f0; }
+
+  /* journey */
+  .journey { display: flex; gap: 8px; align-items: stretch; margin-top: 30px; flex-wrap: wrap; }
+  .jnode { flex: 1; min-width: 140px; text-align: center; }
+  .jnode .box {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: 16px 10px 14px; height: 100%;
+  }
+  .jnode .ic { font-size: 22px; margin-bottom: 8px; }
+  .jnode .t { font-weight: 800; font-size: 14.5px; margin-bottom: 4px; }
+  .jnode .d { color: var(--muted); font-size: 11.5px; line-height: 1.6; }
+  .jnode .human {
+    margin-top: 10px; font-family: var(--mono); font-size: 10.5px;
+    color: var(--accent); background: var(--accent-dim);
+    border: 1px dashed #34d39955; border-radius: 8px; padding: 4px 6px;
+  }
+  .jarrow { display: flex; align-items: center; color: var(--muted); font-size: 16px; }
+
+  .cover-mark {
+    font-family: var(--mono); font-size: 13px; letter-spacing: .3em;
+    color: var(--accent); margin-bottom: 26px;
+  }
+  .tagline {
+    margin-top: 26px; font-size: clamp(15px, 1.8vw, 21px); color: var(--muted);
+  }
+  .tagline b { color: var(--text); }
+  .kbd {
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+    border: 1px solid var(--line); border-radius: 6px; padding: 2px 7px;
+  }
+
+  .painGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 30px; }
+  @media (max-width: 700px) { .painGrid { grid-template-columns: 1fr; } }
+  .pain {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: 20px;
+  }
+  .pain .pt { font-weight: 800; font-size: 16px; margin-bottom: 6px; }
+  .pain .pd { color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  .closing-big {
+    font-size: clamp(36px, 6vw, 72px); font-weight: 900; letter-spacing: .02em;
+    margin-top: 30px; color: var(--text);
+  }
+  .closing-big .g { color: var(--accent); }
+  .roadmap { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 26px; }
+  .roadmap .chip { font-size: 11.5px; padding: 6px 12px; }
+</style>
+</head>
+<body>
+
+<div class="progress" id="bar"></div>
+
+<!-- 1. 封面 -->
+<section class="slide active">
+  <div class="inner" style="text-align:center">
+    <div class="cover-mark">CODEMEET AI · V1 DEMO</div>
+    <h1>會議即開發助理</h1>
+    <p class="tagline">從一場會議，到一個所有人能 <b class="mono">git clone</b> 的 Repo</p>
+    <div class="journey" style="max-width:900px;margin:44px auto 0">
+      <div class="jnode"><div class="box"><div class="ic">🎙</div><div class="t">開會</div><div class="d">即時逐字稿</div></div></div>
+      <div class="jarrow">→</div>
+      <div class="jnode"><div class="box"><div class="ic">📋</div><div class="t">PRD</div><div class="d">規格自動生成</div></div></div>
+      <div class="jarrow">→</div>
+      <div class="jnode"><div class="box"><div class="ic">🗂</div><div class="t">任務</div><div class="d">同步 DevOps</div></div></div>
+      <div class="jarrow">→</div>
+      <div class="jnode"><div class="box"><div class="ic">⚡</div><div class="t">MVP</div><div class="d">畫面直接生成</div></div></div>
+      <div class="jarrow">→</div>
+      <div class="jnode"><div class="box"><div class="ic">🚀</div><div class="t">Repo</div><div class="d">clone 即開工</div></div></div>
+    </div>
+    <p class="tagline" style="margin-top:40px;font-size:13px">按 <span class="kbd">→</span> 開始</p>
+  </div>
+</section>
+
+<!-- 2. 痛點 -->
+<section class="slide">
+  <div class="inner">
+    <div class="eyebrow">The Problem</div>
+    <h2>每次開完需求會議之後⋯⋯</h2>
+    <div class="painGrid">
+      <div class="pain"><div class="pt">🧠 重點忘光</div><div class="pd">「上次說欄位要哪五個？」——會議結束 48 小時，細節只剩三成。</div></div>
+      <div class="pain"><div class="pt">📄 PRD 沒人寫</div><div class="pd">人人都覺得該有規格文件，人人都不想當那個寫的人。</div></div>
+      <div class="pain"><div class="pt">🎫 手動開任務</div><div class="pd">在 DevOps 上一張一張建工作項目、貼標籤、找負責人，開到懷疑人生。</div></div>
+      <div class="pain"><div class="pt">⏳ MVP 要等兩週</div><div class="pd">客戶想「先看個樣子」，但光是專案初始化和架構討論就燒掉一個 Sprint。</div></div>
+    </div>
+    <p class="lede" style="margin-top:28px">CodeMeet AI 把會後三天的苦工，壓縮成<b style="color:var(--accent)">四次確認點擊</b>。</p>
+  </div>
+</section>
+
+<!-- 3. 情境 01 開會 -->
+<section class="slide">
+  <div class="inner cols">
+    <div>
+      <div class="eyebrow">情境 01 · 會議中心</div>
+      <h2>會議直接在 CodeMeet 開</h2>
+      <p class="lede">Amon 的團隊要做電商後台。他在 CodeMeet 發起視訊會議，四個人邊討論——</p>
+      <ul class="points">
+        <li>AI 同步產生<b>即時逐字稿</b>，聽到需求句就當場標記「關鍵需求」</li>
+        <li>視訊、語音通話、輸入代碼加入，都走同一條分析管線</li>
+        <li>掛斷後錄音自動留存到<b>會議紀錄列表</b>，隨時可回頭分析——不用任何人記得按錄音</li>
+      </ul>
+    </div>
+    <div class="mock">
+      <div class="mock-title"><span class="dotr"></span> REC · AI 逐字稿擷取中 <span class="mut mono num" style="margin-left:auto">12:47</span></div>
+      <div class="tiles">
+        <div class="tile"><div class="avatar">A</div>Amon · PM</div>
+        <div class="tile speaking"><div class="avatar">K</div>Ken · 後端 🎤</div>
+        <div class="tile"><div class="avatar">I</div>Ivy · 前端</div>
+        <div class="tile"><div class="avatar">Z</div>Zoe · 設計</div>
+      </div>
+      <div class="stack">
+        <div class="card"><span class="mut mono">Amon 01:24</span> 欄位要有訂單編號、買家姓名、金額、付款狀態⋯ <span class="chip">✦ 關鍵需求</span></div>
+        <div class="card" style="border-color:#34d39966"><span class="mut mono">Ken 02:40</span> API 我會開一支 GET /orders 支援分頁跟狀態篩選 <span class="chip">✦ 關鍵需求</span></div>
+        <div class="card"><span class="mut mono">⋯</span> <span class="mut">聆聽中</span> <span class="dotg" style="display:inline-block"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. 情境 02 PRD -->
+<section class="slide">
+  <div class="inner cols">
+    <div>
+      <div class="eyebrow">情境 02 · 語意收斂</div>
+      <h2>會議結束的那一秒，<br>PRD 已經在路上</h2>
+      <ul class="points">
+        <li>精華總結＋ <b>4 條 User Story 與驗收標準</b>，句句可追溯到逐字稿出處</li>
+        <li><span class="amber">痛點攔截</span>：「會議沒提行動版 → 預設採用 RWD」——沒講到的，AI 先攔下來</li>
+        <li><b>技術棧決策</b>：Ivy 說過要用 Next.js，AI 自動帶入並附出處；後端和資料庫沒人提，就留給團隊拍板（也能自行輸入其他框架）</li>
+        <li>全部拍板完，才放行進入下一步——<b>AI 不自作主張</b></li>
+      </ul>
+    </div>
+    <div class="mock">
+      <div class="mock-title">PRD · 電商後台系統需求討論會議</div>
+      <div class="stack">
+        <div class="card"><span class="chip plain">US-1</span> <span class="chip">P0</span> 身為營運人員，我想在後台查看訂單列表⋯<div class="mut" style="margin-top:4px">✓ 五欄位表格 ✓ 狀態顏色標籤 ✓ 分頁 20 筆</div></div>
+        <div class="card" style="border-color:#f5b94f55;background:var(--amber-dim)"><span class="chip warn">⚠ 痛點攔截</span> 未提及行動版設計<div class="mut" style="margin-top:4px">預設決策：採用響應式設計（RWD）</div></div>
+        <div class="card">
+          <div class="row" style="margin-bottom:6px"><b style="font-size:12px">前端框架</b> <span class="chip">✓ 自動偵測 · Next.js</span></div>
+          <div class="mut">出處：Ivy 01:05「前端我打算用我們熟的 Next.js 來開」</div>
+        </div>
+        <div class="card">
+          <div class="row" style="margin-bottom:6px"><b style="font-size:12px">後端框架</b> <span class="chip warn">待決策</span></div>
+          <div class="row"><span class="chip plain">ASP.NET Core（預設）</span><span class="chip plain">Spring Boot</span><span class="chip plain">NestJS</span><span class="chip plain">FastAPI</span><span class="chip plain">✎ 其他</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. 情境 03 任務 -->
+<section class="slide">
+  <div class="inner cols">
+    <div>
+      <div class="eyebrow">情境 03 · 任務看板</div>
+      <h2>任務自動開好，<br>指派或認領後同步 DevOps</h2>
+      <ul class="points">
+        <li>AI 依 PRD 拆出 <b>6 個開發任務</b>：標籤、Story Points、技術棧、建議負責人一次到位</li>
+        <li>建議可以改——下拉改派，或按「認領」把任務抓給自己</li>
+        <li>一鍵同步：每個任務推進負責人<b>自己的 Azure DevOps</b>，拿到正式的工作項目編號 <span class="mono" style="color:var(--accent)">AB#2841</span></li>
+      </ul>
+    </div>
+    <div class="mock">
+      <div class="mock-title">任務看板 · To Do <span class="chip" style="margin-left:auto">已同步 6 個工作項目</span></div>
+      <div class="stack">
+        <div class="card">
+          <div class="row"><span class="mono mut">CM-101</span><span class="mut num" style="margin-left:auto">5 pt</span></div>
+          <div style="margin:4px 0">建立訂單列表頁面（表格＋狀態標籤＋分頁）</div>
+          <div class="row"><span class="chip plain">Frontend</span><span class="chip plain">Next.js</span><span class="chip">✓ AB#2841 · Ivy</span></div>
+        </div>
+        <div class="card">
+          <div class="row"><span class="mono mut">CM-102</span><span class="mut num" style="margin-left:auto">5 pt</span></div>
+          <div style="margin:4px 0">開發 GET /orders API（分頁＋狀態篩選）</div>
+          <div class="row"><span class="chip plain">Backend</span><span class="chip plain">ASP.NET Core</span><span class="chip">✓ AB#2842 · Ken</span></div>
+        </div>
+        <div class="card">
+          <div class="row"><span class="mono mut">CM-105</span><span class="mut num" style="margin-left:auto">3 pt</span></div>
+          <div style="margin:4px 0">Dashboard 統計卡（今日訂單／本月營收⋯）</div>
+          <div class="row"><span class="chip plain">Frontend</span><span class="chip">✓ AB#2845 · Zoe</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. 情境 04 MVP -->
+<section class="slide">
+  <div class="inner cols">
+    <div>
+      <div class="eyebrow">情境 04 · MVP 視覺生成</div>
+      <h2>按下「確認開工」，<br>畫面自己長出來</h2>
+      <ul class="points">
+        <li><b>Semantic Router</b> 掃描逐字稿：命中「後台、訂單、匯出」→ 路由至管理後台模版</li>
+        <li>依技術棧決策生成對應語言的程式碼骨架——選 ASP.NET Core 就是 C#，改選 FastAPI 就變 Python</li>
+        <li>標題、欄位、統計卡全部<b>由會議內容動態填入</b></li>
+        <li>不喜歡？三種佈局隨點隨換；<b>分工檢視</b>把每塊 UI 標回「哪個任務・誰負責」</li>
+      </ul>
+    </div>
+    <div class="stack">
+      <div class="term">
+        <div class="w">$ codemeet generate --mode greenfield</div>
+        <div class="b">▸ 場景判定：管理後台模版（AdminDashboard）</div>
+        <div class="b">▸ 套用技術棧：Next.js · ASP.NET Core · PostgreSQL</div>
+        <div class="g">✔ MVP 組譯完成，正在渲染預覽</div>
+      </div>
+      <div class="mock">
+        <div class="mock-title">電商後台管理系統 <span class="row" style="margin-left:auto"><span class="chip plain">經典儀表板</span><span class="chip plain">側欄工作台</span><span class="chip plain">深色戰情室</span></span></div>
+        <div class="grid2" style="grid-template-columns:1fr 1fr 1fr 1fr;margin-bottom:10px">
+          <div class="card"><div class="mut">今日訂單</div><b class="num">128</b></div>
+          <div class="card"><div class="mut">本月營收</div><b class="num">842K</b></div>
+          <div class="card"><div class="mut">待出貨</div><b class="num">36</b></div>
+          <div class="card" style="border:1px dashed var(--accent)"><div class="mut">退貨率</div><b class="num">1.8%</b><div><span class="chip">CM-105 · Zoe</span></div></div>
+        </div>
+        <div class="card">
+          <div class="row mut mono" style="gap:14px">訂單編號 · 買家姓名 · 金額 · 狀態 · 時間</div>
+          <div class="bar" style="margin-top:8px"></div>
+          <div class="bar" style="margin-top:6px;width:85%"></div>
+          <div class="bar" style="margin-top:6px;width:92%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. 情境 05 交接 -->
+<section class="slide">
+  <div class="inner cols">
+    <div>
+      <div class="eyebrow">情境 05 · 分工交接</div>
+      <h2>發佈 Repo，<br>每個人 clone 下來就知道要做什麼</h2>
+      <ul class="points">
+        <li><b>一個任務＝一個模組＝一位負責人</b>——大家的 PR 天生不相交，commit 不打架</li>
+        <li>程式碼裡埋好 <span class="amber">TODO 錨點</span>：IDE 搜自己的名字，待辦全列出來</li>
+        <li><span class="mono">contracts/openapi.yaml</span> 共用合約走 CODEOWNERS 雙簽，前後端平行開發也不會踩線</li>
+        <li>一鍵發佈：建 Repo、開 6 條分支、套分支保護、發交接檔給 4 位成員</li>
+      </ul>
+    </div>
+    <div class="stack">
+      <div class="mock">
+        <div class="mock-title">features/order-list/OrderTable.tsx <span class="chip" style="margin-left:auto">CM-101 · Ivy</span></div>
+        <div class="code">
+          <div><span class="kw">export function</span> OrderTable({ orders }) {</div>
+          <div>&nbsp;&nbsp;<span class="anchor">// TODO(CM-101 AB#2841 @Ivy): 串接 GET /api/orders</span></div>
+          <div>&nbsp;&nbsp;<span class="kw">return</span> ( ⋯ )</div>
+          <div>}</div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mock-title"><span class="dotg"></span> Repo 已發佈 · main 已保護 · CODEOWNERS 生效</div>
+        <div class="code" style="color:var(--muted)">
+          <div><span class="g" style="color:var(--accent)">✓</span> git init · 初始 commit（含 6 個 AB# 連結）</div>
+          <div><span class="g" style="color:var(--accent)">✓</span> 建立 6 條 feature 分支</div>
+          <div><span class="g" style="color:var(--accent)">✓</span> 邀請 4 位協作者，發送各自交接檔</div>
+        </div>
+        <div class="card mono" style="margin-top:10px;font-size:11px">git clone https://dev.azure.com/codemeet/ecommerce-admin</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. 全景 -->
+<section class="slide">
+  <div class="inner">
+    <div class="eyebrow">The Journey</div>
+    <h2>AI 做繁重的，人只做決定</h2>
+    <p class="lede">整條管線裡，人類出手的只有四個確認點——每一個都是該由人拍板的決策，而不是苦工。</p>
+    <div class="journey">
+      <div class="jnode"><div class="box"><div class="ic">🎙</div><div class="t">開會</div><div class="d">逐字稿・關鍵需求標記</div></div></div>
+      <div class="jarrow">→</div>
+      <div class="jnode"><div class="box"><div class="ic">📋</div><div class="t">PRD</div><div class="d">User Story・痛點攔截</div><div class="human">✋ 確認技術棧</div></div></div>
+      <div class="jarrow">→</div>
+      <div class="jnode"><div class="box"><div class="ic">🗂</div><div class="t">任務</div><div class="d">拆解・同步 Azure DevOps</div><div class="human">✋ 確認指派</div></div></div>
+      <div class="jarrow">→</div>
+      <div class="jnode"><div class="box"><div class="ic">⚡</div><div class="t">MVP</div><div class="d">語意路由・動態組譯</div><div class="human">✋ 確認開工</div></div></div>
+      <div class="jarrow">→</div>
+      <div class="jnode"><div class="box"><div class="ic">🚀</div><div class="t">Repo</div><div class="d">分支・保護・交接檔</div><div class="human">✋ 確認發佈</div></div></div>
+    </div>
+    <p class="lede" style="margin-top:30px">會後的產出不依賴 CodeMeet 存活——PRD、工作項目、程式碼、交接檔<b style="color:var(--accent)">全部落在團隊自己的工具鏈裡</b>（Azure DevOps＋Git），工具關掉，資產還在。</p>
+  </div>
+</section>
+
+<!-- 9. 收尾 -->
+<section class="slide">
+  <div class="inner" style="text-align:center">
+    <div class="eyebrow" style="text-align:center">Roadmap</div>
+    <p class="lede" style="margin:0 auto">V1 以模版路由保證產出下限；接下來讓 LLM 接手上限——</p>
+    <div class="roadmap" style="justify-content:center">
+      <span class="chip plain">LLM 即時生成完整專案程式碼</span>
+      <span class="chip plain">對話式微調 MVP 畫面</span>
+      <span class="chip plain">會議 Bot 接入 Teams / Meet</span>
+      <span class="chip plain">Jira / Linear 同步支援</span>
+    </div>
+    <div class="closing-big">開完會，<span class="g">就開工。</span></div>
+    <p class="tagline">CodeMeet AI · 會議即開發助理</p>
+  </div>
+</section>
+
+<div class="hint">← → 翻頁 · F11 全螢幕</div>
+<div class="nav">
+  <button id="prev" aria-label="上一頁">←</button>
+  <span id="counter" class="num">1 / 9</span>
+  <button id="next" aria-label="下一頁">→</button>
+</div>
+
+<script>
+  const slides = [...document.querySelectorAll(".slide")];
+  const bar = document.getElementById("bar");
+  const counter = document.getElementById("counter");
+  let cur = 0;
+  function go(i) {
+    cur = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, j) => s.classList.toggle("active", j === cur));
+    bar.style.width = ((cur + 1) / slides.length) * 100 + "%";
+    counter.textContent = (cur + 1) + " / " + slides.length;
+  }
+  document.getElementById("prev").addEventListener("click", () => go(cur - 1));
+  document.getElementById("next").addEventListener("click", () => go(cur + 1));
+  document.addEventListener("keydown", (e) => {
+    if (["ArrowRight", "ArrowDown", "PageDown", " "].includes(e.key)) { e.preventDefault(); go(cur + 1); }
+    if (["ArrowLeft", "ArrowUp", "PageUp"].includes(e.key)) { e.preventDefault(); go(cur - 1); }
+    if (e.key === "Home") go(0);
+    if (e.key === "End") go(slides.length - 1);
+  });
+  go(0);
+</script>
+
+</body>
+</html>
