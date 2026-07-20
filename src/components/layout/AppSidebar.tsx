@@ -44,7 +44,7 @@ export function AppSidebar({
           <Sparkles className="size-5" />
         </div>
         <div className="leading-tight">
-          <p className="text-sm font-semibold tracking-tight">CodeMeet AI</p>
+          <p className="text-sm font-semibold tracking-tight">MeetAdream AI</p>
           <p className="text-xs text-muted-foreground">會議即開發助理</p>
         </div>
       </div>

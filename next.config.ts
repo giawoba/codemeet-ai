@@ -5,7 +5,7 @@ const isGithubPages = process.env.DEPLOY_TARGET === "gh-pages";
 
 const nextConfig: NextConfig = {
   output: isGithubPages ? "export" : undefined,
-  basePath: isGithubPages ? "/codemeet-ai" : undefined,
+  basePath: isGithubPages ? "/meetadream-ai" : undefined,
   images: { unoptimized: true },
 };
 

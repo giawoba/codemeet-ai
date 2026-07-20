@@ -1,5 +1,5 @@
 // ============================================================
-// CodeMeet AI — V1 Demo Mock Data
+// MeetAdream AI — V1 Demo Mock Data
 // 電商後台需求會議：逐字稿 → PRD → DevOps Tickets → MVP 模版路由
 // ============================================================
 
@@ -552,7 +552,7 @@ export function generateCodeowners(
   techChoices: Record<string, string>
 ): string {
   const lines = [
-    "# 由 CodeMeet AI 產生 — 任務改派時同步更新此檔",
+    "# 由 MeetAdream AI 產生 — 任務改派時同步更新此檔",
     "# 一個任務一個模組一位負責人；動到誰的地盤，PR 自動找誰 review",
     "",
   ];
@@ -567,7 +567,7 @@ export function generateCodeowners(
   return lines.join("\n");
 }
 
-/** 依目前指派結果動態產生每人的交接檔（.codemeet/handoff/NAME.md） */
+/** 依目前指派結果動態產生每人的交接檔（.meetadream/handoff/NAME.md） */
 export function generateHandoffMd(
   memberName: string,
   assignments: Record<string, string>,
@@ -582,7 +582,7 @@ export function generateHandoffMd(
   const lines = [
     `# ${memberName} 的開發交接檔`,
     ``,
-    `> 由 CodeMeet AI 產生 · 會議：${sampleMeeting.title}（${sampleMeeting.date}）`,
+    `> 由 MeetAdream AI 產生 · 會議：${sampleMeeting.title}（${sampleMeeting.date}）`,
     `> Azure DevOps：${member?.azureOrg ?? "-"}`,
     ``,
     `## 你的任務（${myModules.length} 個）`,

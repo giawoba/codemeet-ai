@@ -115,7 +115,7 @@ export function Step4MvpPreview({
   const startGeneration = () => {
     const route = routeMeetingToTemplate(sampleMeeting);
     const script: string[] = [
-      "$ codemeet generate --mode greenfield",
+      "$ meetadream generate --mode greenfield",
       "▸ 解析會議語意向量...",
       `▸ Semantic Router 命中關鍵字：${route.matchedKeywords.map((k) => `"${k}"`).join(", ")}`,
       `▸ 場景判定：${route.label}（${route.template}）· 信心分數 ${route.score}/${route.matchedKeywords.length + 2}`,
@@ -295,7 +295,7 @@ export function Step4MvpPreview({
               <span className="size-3 rounded-full bg-yellow-500" />
               <span className="size-3 rounded-full bg-green-500" />
               <span className="ml-3 font-mono text-xs text-zinc-400">
-                codemeet-ai — mvp-generator
+                meetadream-ai — mvp-generator
               </span>
             </div>
             <div className="min-h-72 space-y-2 p-4 font-mono text-sm">
@@ -342,7 +342,7 @@ export function Step4MvpPreview({
                       {mvpPreviewData.appTitle}
                     </h2>
                     <p className="text-xs text-muted-foreground">
-                      由 CodeMeet AI 依會議內容自動生成 ·{" "}
+                      由 MeetAdream AI 依會議內容自動生成 ·{" "}
                       {previewThemes.find((t) => t.key === previewTheme)?.label}
                       佈局
                       {techStack.length > 0 && ` · ${techStack.join(" + ")}`}

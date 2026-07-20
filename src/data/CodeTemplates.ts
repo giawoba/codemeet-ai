@@ -1,5 +1,5 @@
 // ============================================================
-// CodeMeet AI — 框架程式碼模版
+// MeetAdream AI — 框架程式碼模版
 // Step 2 選定的技術棧，決定 Step 4 生成的骨架程式碼長什麼樣。
 // 前端 4 框架 × 後端 4 框架，模版獨立組合（非 16 套）。
 // 內文的 TODO(CM-xxx) 錨點由 expandTodoAnchors 於渲染時展開。
@@ -192,7 +192,7 @@ export class OrderListComponent {
       {
         name: "OrderList.razor",
         content: `@page "/orders"
-@using CodeMeet.Contracts
+@using MeetAdream.Contracts
 
 <table>
   <thead>
@@ -404,7 +404,7 @@ export class StatCardsComponent {
     files: [
       {
         name: "StatCards.razor",
-        content: `@using CodeMeet.Contracts
+        content: `@using MeetAdream.Contracts
 
 @* 四張統計卡由會議逐字稿萃取（Amon 06:30） *@
 @foreach (var c in Cards)
@@ -463,9 +463,9 @@ const ordersApiTemplates: Record<string, (db: string) => ModuleScaffold> = {
       {
         name: "OrdersController.cs",
         content: `using Microsoft.AspNetCore.Mvc;
-using CodeMeet.Contracts;
+using MeetAdream.Contracts;
 
-namespace CodeMeet.Api.Orders;
+namespace MeetAdream.Api.Orders;
 
 [ApiController]
 [Route("api/orders")]
@@ -484,11 +484,11 @@ public class OrdersController : ControllerBase
     ],
   }),
   "Spring Boot": (db) => ({
-    path: "src/main/java/com/codemeet/orders",
+    path: "src/main/java/com/meetadream/orders",
     files: [
       {
         name: "OrderController.java",
-        content: `package com.codemeet.orders;
+        content: `package com.meetadream.orders;
 
 import org.springframework.web.bind.annotation.*;
 
@@ -559,9 +559,9 @@ const csvTemplates: Record<string, (db: string) => ModuleScaffold> = {
     files: [
       {
         name: "OrderCsvExporter.cs",
-        content: `using CodeMeet.Contracts;
+        content: `using MeetAdream.Contracts;
 
-namespace CodeMeet.Api.Export;
+namespace MeetAdream.Api.Export;
 
 public static class OrderCsvExporter
 {
@@ -579,13 +579,13 @@ public static class OrderCsvExporter
     ],
   }),
   "Spring Boot": () => ({
-    path: "src/main/java/com/codemeet/export",
+    path: "src/main/java/com/meetadream/export",
     files: [
       {
         name: "OrderCsvExporter.java",
-        content: `package com.codemeet.export;
+        content: `package com.meetadream.export;
 
-import com.codemeet.orders.Order;
+import com.meetadream.orders.Order;
 import java.util.List;
 import java.util.stream.Collectors;
 

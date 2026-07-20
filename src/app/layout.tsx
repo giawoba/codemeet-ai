@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CodeMeet AI — 會議即開發助理",
+  title: "MeetAdream AI — 會議即開發助理",
   description: "將會議語音/逐字稿，自動轉化為軟體工程的實體產出",
 };
 

@@ -40,7 +40,7 @@ type ViewMode = "module" | "person";
 type PublishState = "idle" | "publishing" | "published";
 
 const REPO_URL =
-  "https://dev.azure.com/codemeet/ecommerce-admin/_git/ecommerce-admin";
+  "https://dev.azure.com/meetadream/ecommerce-admin/_git/ecommerce-admin";
 const INITIAL_COMMIT = "a1b2c3d";
 
 interface FileEntry {
@@ -69,7 +69,7 @@ export function Step4Handoff({
   // ----- 發佈至 Git Repo（謝幕動畫） -----
   const publishSteps = [
     `git init ecommerce-admin · 初始 commit ${INITIAL_COMMIT}（訊息含 ${codeModules.length} 個 AB# 連結）`,
-    "push → dev.azure.com/codemeet/ecommerce-admin",
+    "push → dev.azure.com/meetadream/ecommerce-admin",
     `建立 ${codeModules.length} 條 feature 分支`,
     "套用 main 分支保護：PR 必經 · CODEOWNERS 雙簽生效",
     `邀請 ${teamMembers.length} 位協作者，發送 clone URL 與各自的交接檔`,
@@ -160,7 +160,7 @@ export function Step4Handoff({
           })),
           {
             key: "handoff",
-            title: ".codemeet/handoff/",
+            title: ".meetadream/handoff/",
             meta: "每人交接檔",
             files: teamMembers.map((m) => ({
               id: `handoff:${m.name}`,
@@ -221,7 +221,7 @@ export function Step4Handoff({
     if (id.startsWith("handoff:")) {
       const name = id.slice("handoff:".length);
       return {
-        title: `.codemeet/handoff/${name.toUpperCase()}.md`,
+        title: `.meetadream/handoff/${name.toUpperCase()}.md`,
         content: generateHandoffMd(name, assignments, workItemIds, techChoices),
       };
     }
@@ -262,7 +262,7 @@ export function Step4Handoff({
                   程式碼骨架與分工產物已就緒
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  發佈後成員即可 clone 專案、切到自己的分支開工，CodeMeet
+                  發佈後成員即可 clone 專案、切到自己的分支開工，MeetAdream
                   功成身退
                 </p>
               </div>
